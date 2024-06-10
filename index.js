@@ -125,7 +125,6 @@ app.post('/code/validate', async (req, res) => {
         }
         console.log('Code validated successfully:', code);
         res.status(200).json({message: 'Code validated successfully:', codeNumber: code.codeNumber});
-        await Code.deleteOne(code._id);
     } catch (error) {
         console.error('Error validating code:', error);
         res.status(500).json({ error: 'Server error' });
