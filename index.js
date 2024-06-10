@@ -163,7 +163,7 @@ app.post('/submit', async (req, res) => {
             response: responses
         });
         const savedResponse = await newResponse.save();
-        res.status(200).send({"message":'Responses submitted successfully!', });
+        res.status(200).send({message:'Responses submitted successfully!', responseId: newResponse._id});
     } catch (error) {
         console.error('Error submitting responses:', error);
         res.status(500).json({ error: 'Server error' });
