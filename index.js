@@ -158,13 +158,10 @@ app.post('/entry', async (req, res) => {
 app.post('/submit', async (req, res) => {
     try {
         const { id, responses } = req.body;
-        const newResponse = new Response({
-            patient: id,
-            response: responses
-        });
+        const newResponse = new Response({patient: id, response: responses});
         const savedResponse = await newResponse.save();
-        console.log('Patient added successfully:', savedPatient._id);
-        res.status(200).send({message:'Responses submitted successfully!', id: newResponse._id});
+        console.log('Response added successfully:', savedResponse._id);
+        res.status(200).send({message:'Responses submitted successfully!', id: savedResponse._id});
     } catch (error) {
         console.error('Error submitting responses:', error);
         res.status(500).json({ error: 'Server error' });
