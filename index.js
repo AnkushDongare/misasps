@@ -2,12 +2,21 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const helmet = require('helmet');
+
 require('dotenv').config();
 
 const app = express();
 const port = process.env.PORT || 5000;
 
-app.use(cors());
+app.use(helmet());
+
+const corsOptions = {
+    origin: 'https://misasps.netlify.app',
+    optionsSuccessStatus: 200
+  };
+app.use(cors(corsOptions));
+
 app.use(bodyParser.json());
 
 // Connect to MongoDB using the URL from environment variables
