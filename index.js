@@ -14,7 +14,7 @@ app.use(helmet());
 const corsOptions = {
     origin: 'https://misasps.netlify.app',
     optionsSuccessStatus: 200
-  };
+};
 app.use(cors(corsOptions));
 
 app.use(bodyParser.json());
@@ -66,9 +66,23 @@ const patientSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    subjects: {
-        type: [String],
-        required: true
+    subject1: {
+        type: String,
+    },
+    subject2: {
+        type: String,
+    },
+    subject3: {
+        type: String,
+    },
+    subject4: {
+        type: String,
+    },
+    subject5: {
+        type: String,
+    },
+    subject6: {
+        type: String,
     },
     institution: {
         type: String,
@@ -133,7 +147,7 @@ app.post('/code/validate', async (req, res) => {
             return res.status(404).json({ error: 'Code not found' });
         }
         console.log('Code validated successfully:', code);
-        res.status(200).json({message: 'Code validated successfully:', codeNumber: code.codeNumber});
+        res.status(200).json({ message: 'Code validated successfully:', codeNumber: code.codeNumber });
     } catch (error) {
         console.error('Error validating code:', error);
         res.status(500).json({ error: 'Server error' });
@@ -158,17 +172,30 @@ app.post('/entry', async (req, res) => {
 app.post('/submit', async (req, res) => {
     try {
         const { id, responses } = req.body;
-        const newResponse = new Response({patient: id, response: responses});
+        const newResponse = new Response({ patient: id, response: responses });
         const savedResponse = await newResponse.save();
         console.log('Response added successfully:', savedResponse._id);
-        res.status(200).send({message:'Responses submitted successfully!', id: savedResponse._id});
+        res.status(200).send({ message: 'Responses submitted successfully!', id: savedResponse._id });
     } catch (error) {
         console.error('Error submitting responses:', error);
         res.status(500).json({ error: 'Server error' });
     }
 });
 
-app.get('/', async(req, res)=>{
+// Endpoint to get data  responses
+app.get('/api/data', async (req, res) => {
+    try {
+        const { id, responses } = req.body;
+        const newResponse = await Response();
+        res.status(200).send({ newResponse });
+    } catch (error) {
+        console.error('Error submitting responses:', error);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+
+
+app.get('/', async (req, res) => {
     res.send("Hello World!")
 })
 
