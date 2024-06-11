@@ -12,10 +12,12 @@ const port = process.env.PORT || 5000;
 app.use(helmet());
 
 const corsOptions = {
-    origin: 'https://misasps.netlify.app',
+    origin: ['https://misasps.netlify.app', 'http://localhost:5173'],
     optionsSuccessStatus: 200
 };
+
 app.use(cors(corsOptions));
+
 
 app.use(bodyParser.json());
 
@@ -185,15 +187,109 @@ app.post('/submit', async (req, res) => {
 // Endpoint to get data  responses
 app.get('/api/data', async (req, res) => {
     try {
-        const { id, responses } = req.body;
-        const newResponse = await Response();
-        res.status(200).send({ newResponse });
+        const response = await Response.find({});
+        res.status(200).send({ response });
     } catch (error) {
         console.error('Error submitting responses:', error);
         res.status(500).json({ error: 'Server error' });
     }
 });
 
+// Endpoint to get data by ID
+app.post('/api/data', async (req, res) => {
+    const { id } = req.body;
+
+    if (!id) {
+        return res.status(400).json({ error: 'ID is required' });
+    }
+
+    try {
+        const response = await Response.findById(id);
+
+        if (!response) {
+            return res.status(404).json({ error: 'Data not found' });
+        }
+
+        res.status(200).json({ response });
+    } catch (error) {
+        console.error('Error retrieving data:', error);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+
+// Endpoint to get data  responses
+app.get('/get/patient', async (req, res) => {
+    try {
+        const response = await Patient.find({});
+        res.status(200).send({ response });
+    } catch (error) {
+        console.error('Error submitting responses:', error);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+// Endpoint to get Patient by ID
+app.post('/get/patient', async (req, res) => {
+    const { id } = req.body;
+
+    if (!id) {
+        return res.status(400).json({ error: 'ID is required' });
+    }
+
+    try {
+        const response = await Patient.findById(id);
+
+        if (!response) {
+            return res.status(404).json({ error: 'Patient not found' });
+        }
+
+        res.status(200).json({ response });
+    } catch (error) {
+        console.error('Error retrieving Patient:', error);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+
+const categories = {
+    Linguistic: [10, 19, 37, 46, 64, 73, 1, 28, 55, 82],
+    Logical: [2, 20, 29, 47, 56, 74, 83, 11, 38, 65],
+    BodilyKinesthetic: [3, 12, 30, 39, 57, 66, 84, 21, 48, 75],
+    Spatial: [13, 22, 40, 49, 67, 76, 4, 31, 58, 85],
+    Musical: [5, 23, 32, 50, 59, 77, 86, 14, 41, 68],
+    Naturalistic: [6, 15, 33, 42, 60, 69, 87, 24, 51, 78],
+    Interpersonal: [16, 25, 43, 52, 70, 79, 7, 34, 61, 88],
+    Intrapersonal: [8, 26, 35, 53, 62, 80, 89, 17, 44, 71],
+    Existential: [9, 18, 36, 45, 63, 72, 90, 27, 54, 81]
+};
+
+// Endpoint to get data by ID and compute category sums
+app.post('/api/result', async (req, res) => {
+    const { id } = req.body;
+
+    if (!id) {
+        return res.status(400).json({ error: 'ID is required' });
+    }
+
+    try {
+        const response = await Response.findById(id);
+
+        if (!response) {
+            return res.status(404).json({ error: 'Data not found' });
+        }
+
+        const { response: responseData } = response;
+
+        const categoryResults = Object.entries(categories).reduce((acc, [category, ids]) => {
+            const sum = ids.reduce((total, id) => total + (responseData[id] || 0), 0);
+            acc[category] = sum;
+            return acc;
+        }, {});
+
+        res.status(200).json({ patient: response.patient, categoryResults });
+    } catch (error) {
+        console.error('Error retrieving data:', error);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
 
 app.get('/', async (req, res) => {
     res.send("Hello World!")
